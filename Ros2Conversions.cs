@@ -9,6 +9,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Simulator.Bridge.Data;
+using Simulator.Bridge.Data.Ros;
+using Simulator.Bridge.Data.Lgsvl;
 using Unity.Mathematics;
 // NOTE: DO NOT add using "Ros2.Ros" or "Ros2.Lgsvl" namespaces here to avoid
 // NOTE: confusion between types. Keep them fully qualified in this file.
@@ -17,11 +19,11 @@ namespace Simulator.Bridge.Ros2
 {
     static class Ros2Conversions
     {
-        public static Ros.CompressedImage ConvertFrom(ImageData data)
+        public static CompressedImage ConvertFrom(ImageData data)
         {
-            return new Ros.CompressedImage()
+            return new CompressedImage()
             {
-                header = new Ros.Header()
+                header = new Header()
                 {
                     stamp = Convert(data.Time),
                     frame_id = data.Frame,
@@ -35,11 +37,11 @@ namespace Simulator.Bridge.Ros2
             };
         }
 
-        public static Ros.CameraInfo ConvertFrom(CameraInfoData data)
+        public static CameraInfo ConvertFrom(CameraInfoData data)
         {
-            return new Ros.CameraInfo()
+            return new CameraInfo()
             {
-                header = new Ros.Header()
+                header = new Header()
                 {
                     stamp = Convert(data.Time),
                     frame_id = data.Frame,
@@ -75,7 +77,7 @@ namespace Simulator.Bridge.Ros2
                 },
                 binning_x = 0,
                 binning_y = 0,
-                roi = new Ros.RegionOfInterest()
+                roi = new RegionOfInterest()
                 {
                     x_offset = 0,
                     y_offset = 0,
@@ -86,28 +88,28 @@ namespace Simulator.Bridge.Ros2
             };
         }
 
-        public static Lgsvl.Detection2DArray ConvertFrom(Detected2DObjectData data)
+        public static Detection2DArray ConvertFrom(Detected2DObjectData data)
         {
-            return new Lgsvl.Detection2DArray()
+            return new Detection2DArray()
             {
-                header = new Ros.Header()
+                header = new Header()
                 {
                     stamp = Convert(data.Time),
                     frame_id = data.Frame,
                 },
-                detections = data.Data.Select(d => new Lgsvl.Detection2D()
+                detections = data.Data.Select(d => new Detection2D()
                 {
                     id = d.Id,
                     label = d.Label,
                     score = (float)d.Score,
-                    bbox = new Lgsvl.BoundingBox2D()
+                    bbox = new BoundingBox2D()
                     {
                         x = d.Position.x,
                         y = d.Position.y,
                         width = d.Scale.x,
                         height = d.Scale.y
                     },
-                    velocity = new Ros.Twist()
+                    velocity = new Twist()
                     {
                         linear = ConvertToVector(d.LinearVelocity),
                         angular = ConvertToVector(d.AngularVelocity),
@@ -116,7 +118,7 @@ namespace Simulator.Bridge.Ros2
             };
         }
 
-        public static Detected2DObjectArray ConvertTo(Lgsvl.Detection2DArray data)
+        public static Detected2DObjectArray ConvertTo(Detection2DArray data)
         {
             return new Detected2DObjectArray()
             {
@@ -134,16 +136,16 @@ namespace Simulator.Bridge.Ros2
             };
         }
 
-        public static Lgsvl.Detection3DArray ConvertFrom(Detected3DObjectData data)
+        public static Detection3DArray ConvertFrom(Detected3DObjectData data)
         {
-            var arr = new Lgsvl.Detection3DArray()
+            var arr = new Detection3DArray()
             {
-                header = new Ros.Header()
+                header = new Header()
                 {
                     stamp = Convert(data.Time),
                     frame_id = data.Frame,
                 },
-                detections = new List<Lgsvl.Detection3D>(),
+                detections = new List<Detection3D>(),
             };
 
             foreach (var d in data.Data)
@@ -160,21 +162,21 @@ namespace Simulator.Bridge.Ros2
 
                 d.AngularVelocity.z = -d.AngularVelocity.z;
 
-                var det = new Lgsvl.Detection3D()
+                var det = new Detection3D()
                 {
                     id = d.Id,
                     label = d.Label,
                     score = (float)d.Score,
-                    bbox = new Lgsvl.BoundingBox3D()
+                    bbox = new BoundingBox3D()
                     {
-                        position = new Ros.Pose()
+                        position = new Pose()
                         {
                             position = ConvertToPoint(position),
                             orientation = Convert(orientation),
                         },
                         size = ConvertToVector(size),
                     },
-                    velocity = new Ros.Twist()
+                    velocity = new Twist()
                     {
                         linear = ConvertToVector(d.LinearVelocity),
                         angular = ConvertToVector(d.AngularVelocity),
@@ -187,23 +189,23 @@ namespace Simulator.Bridge.Ros2
             return arr;
         }
 
-        public static Lgsvl.SignalArray ConvertFrom(SignalDataArray data)
+        public static SignalArray ConvertFrom(SignalDataArray data)
         {
-            return new Lgsvl.SignalArray()
+            return new SignalArray()
             {
-                header = new Ros.Header()
+                header = new Header()
                 {
                     stamp = Convert(data.Time),
                     frame_id = data.Frame,
                 },
-                signals = data.Data.Select(d => new Lgsvl.Signal()
+                signals = data.Data.Select(d => new Signal()
                 {
                     id = d.SeqId,
                     label = d.Label,
                     score = (float)d.Score,
-                    bbox = new Lgsvl.BoundingBox3D()
+                    bbox = new BoundingBox3D()
                     {
-                        position = new Ros.Pose()
+                        position = new Pose()
                         {
                             position = ConvertToPoint(d.Position),
                             orientation = Convert(d.Rotation),
@@ -214,11 +216,11 @@ namespace Simulator.Bridge.Ros2
             };
         }
 
-        public static Lgsvl.CanBusData ConvertFrom(CanBusData data)
+        public static Data.Lgsvl.CanBusData ConvertFrom(Data.CanBusData data)
         {
-            return new Lgsvl.CanBusData()
+            return new Data.Lgsvl.CanBusData()
             {
-                header = new Ros.Header()
+                header = new Header()
                 {
                     stamp = Convert(data.Time),
                     frame_id = data.Frame,
@@ -236,7 +238,7 @@ namespace Simulator.Bridge.Ros2
                 right_turn_signal_active = data.RightTurnSignal,
                 wipers_active = data.Wipers,
                 reverse_gear_active = data.InReverse,
-                selected_gear = (data.InReverse ? Lgsvl.Gear.GEAR_REVERSE : Lgsvl.Gear.GEAR_DRIVE),
+                selected_gear = (data.InReverse ? Gear.GEAR_REVERSE : Gear.GEAR_DRIVE),
                 engine_active = data.EngineOn,
                 engine_rpm = data.EngineRPM,
                 gps_latitude = data.Latitude,
@@ -247,11 +249,11 @@ namespace Simulator.Bridge.Ros2
             };
         }
 
-        public static Lgsvl.DetectedRadarObjectArray ConvertFrom(DetectedRadarObjectData data)
+        public static DetectedRadarObjectArray ConvertFrom(DetectedRadarObjectData data)
         {
-            var r = new Lgsvl.DetectedRadarObjectArray()
+            var r = new DetectedRadarObjectArray()
             {
-                header = new Ros.Header()
+                header = new Header()
                 {
                     stamp = Convert(data.Time),
                     frame_id = data.Frame,
@@ -260,7 +262,7 @@ namespace Simulator.Bridge.Ros2
 
             foreach (var obj in data.Data)
             {
-                r.objects.Add(new Lgsvl.DetectedRadarObject()
+                r.objects.Add(new Data.Lgsvl.DetectedRadarObject()
                 {
                     sensor_aim = ConvertToVector(obj.SensorAim),
                     sensor_right = ConvertToVector(obj.SensorRight),
@@ -280,11 +282,11 @@ namespace Simulator.Bridge.Ros2
             return r;
         }
 
-        public static Lgsvl.Ultrasonic ConvertFrom(UltrasonicData data)
+        public static Ultrasonic ConvertFrom(UltrasonicData data)
         {
-            return new Lgsvl.Ultrasonic()
+            return new Ultrasonic()
             {
-                header = new Ros.Header()
+                header = new Header()
                 {
                     stamp = Convert(data.Time),
                     frame_id = data.Frame,
@@ -293,19 +295,19 @@ namespace Simulator.Bridge.Ros2
             };
         }
 
-        public static Ros.NavSatFix ConvertFrom(GpsData data)
+        public static NavSatFix ConvertFrom(GpsData data)
         {
-            return new Ros.NavSatFix()
+            return new NavSatFix()
             {
-                header = new Ros.Header()
+                header = new Header()
                 {
                     stamp = Convert(data.Time),
                     frame_id = data.Frame,
                 },
-                status = new Ros.NavSatStatus()
+                status = new NavSatStatus()
                 {
-                    status = Ros.NavFixStatus.STATUS_FIX,
-                    service = Ros.GpsServisType.SERVICE_GPS,
+                    status = NavFixStatus.STATUS_FIX,
+                    service = GpsServisType.SERVICE_GPS,
                 },
                 latitude = data.Latitude,
                 longitude = data.Longitude,
@@ -318,25 +320,25 @@ namespace Simulator.Bridge.Ros2
                     0, 0, 0.0001,
                 },
 
-                position_covariance_type = Ros.CovarianceType.COVARIANCE_TYPE_DIAGONAL_KNOWN
+                position_covariance_type = CovarianceType.COVARIANCE_TYPE_DIAGONAL_KNOWN
             };
         }
 
-        public static Ros.Odometry ConvertFrom(GpsOdometryData data)
+        public static Odometry ConvertFrom(GpsOdometryData data)
         {
-            return new Ros.Odometry()
+            return new Odometry()
             {
-                header = new Ros.Header()
+                header = new Header()
                 {
                     stamp = Convert(data.Time),
                     frame_id = data.Frame,
                 },
                 child_frame_id = data.ChildFrame,
-                pose = new Ros.PoseWithCovariance()
+                pose = new PoseWithCovariance()
                 {
-                    pose = new Ros.Pose()
+                    pose = new Pose()
                     {
-                        position = new Ros.Point()
+                        position = new Point()
                         {
                             x = data.Easting,
                             y = data.Northing,
@@ -354,17 +356,17 @@ namespace Simulator.Bridge.Ros2
                         0, 0, 0, 0, 0, 0.0001
                     }
                 },
-                twist = new Ros.TwistWithCovariance()
+                twist = new TwistWithCovariance()
                 {
-                    twist = new Ros.Twist()
+                    twist = new Twist()
                     {
-                        linear = new Ros.Vector3()
+                        linear = new Vector3()
                         {
                             x = data.ForwardSpeed,
                             y = 0.0,
                             z = 0.0,
                         },
-                        angular = new Ros.Vector3()
+                        angular = new Vector3()
                         {
                             x = 0.0,
                             y = 0.0,
@@ -384,11 +386,11 @@ namespace Simulator.Bridge.Ros2
             };
         }
 
-        public static Lgsvl.VehicleOdometry ConvertFrom(VehicleOdometryData data)
+        public static VehicleOdometry ConvertFrom(VehicleOdometryData data)
         {
-            return new Lgsvl.VehicleOdometry()
+            return new VehicleOdometry()
             {
-                header = new Ros.Header()
+                header = new Header()
                 {
                     stamp = Convert(data.Time),
                 },
@@ -398,7 +400,7 @@ namespace Simulator.Bridge.Ros2
             };
         }
 
-        public static Detected3DObjectArray ConvertTo(Lgsvl.Detection3DArray data)
+        public static Detected3DObjectArray ConvertTo(Detection3DArray data)
         {
             return new Detected3DObjectArray()
             {
@@ -417,7 +419,7 @@ namespace Simulator.Bridge.Ros2
             };
         }
 
-        public static VehicleControlData ConvertTo(Lgsvl.VehicleControlData data)
+        public static Data.VehicleControlData ConvertTo(Data.Lgsvl.VehicleControlData data)
         {
             float Deg2Rad = UnityEngine.Mathf.Deg2Rad;
             float MaxSteeringAngle = 39.4f * Deg2Rad;
@@ -441,7 +443,7 @@ namespace Simulator.Bridge.Ros2
 
             // target_gear are not supported on simulator side
 
-            return new VehicleControlData()
+            return new Data.VehicleControlData()
             {
                 TimeStampSec = Convert(data.header.stamp),
                 Acceleration = data.acceleration_pct,
@@ -451,9 +453,9 @@ namespace Simulator.Bridge.Ros2
             };
         }
 
-        public static VehicleStateData ConvertTo(Lgsvl.VehicleStateData data)
+        public static Data.VehicleStateData ConvertTo(Data.Lgsvl.VehicleStateData data)
         {
-            return new VehicleStateData()
+            return new Data.VehicleStateData()
             {
                 Time = Convert(data.header.stamp),
                 Blinker = (byte) data.blinker_state,
@@ -467,11 +469,11 @@ namespace Simulator.Bridge.Ros2
             };
         }
 
-        public static Ros.Imu ConvertFrom(ImuData data)
+        public static Imu ConvertFrom(ImuData data)
         {
-            return new Ros.Imu()
+            return new Imu()
             {
-                header = new Ros.Header()
+                header = new Header()
                 {
                     stamp = Convert(data.Time),
                     frame_id = data.Frame,
@@ -486,61 +488,61 @@ namespace Simulator.Bridge.Ros2
             };
         }
 
-        public static Ros.Clock ConvertFrom(ClockData data)
+        public static Clock ConvertFrom(ClockData data)
         {
-            return new Ros.Clock()
+            return new Clock()
             {
                 clock = Convert(data.Clock),
             };
         }
 
-        static Ros.Point ConvertToPoint(UnityEngine.Vector3 v)
+        static Point ConvertToPoint(UnityEngine.Vector3 v)
         {
-            return new Ros.Point() { x = v.x, y = v.y, z = v.z };
+            return new Point() { x = v.x, y = v.y, z = v.z };
         }
 
-        static Ros.Point ConvertToPoint(double3 d)
+        static Point ConvertToPoint(double3 d)
         {
-            return new Ros.Point() { x = d.x, y = d.y, z = d.z };
+            return new Point() { x = d.x, y = d.y, z = d.z };
         }
 
-        static Ros.Vector3 ConvertToVector(UnityEngine.Vector3 v)
+        static Vector3 ConvertToVector(UnityEngine.Vector3 v)
         {
-            return new Ros.Vector3() { x = v.x, y = v.y, z = v.z };
+            return new Vector3() { x = v.x, y = v.y, z = v.z };
         }
 
-        static Ros.Quaternion Convert(UnityEngine.Quaternion q)
+        static Quaternion Convert(UnityEngine.Quaternion q)
         {
-            return new Ros.Quaternion() { x = q.x, y = q.y, z = q.z, w = q.w };
+            return new Quaternion() { x = q.x, y = q.y, z = q.z, w = q.w };
         }
 
-        static UnityEngine.Vector3 Convert(Ros.Point p)
+        static UnityEngine.Vector3 Convert(Point p)
         {
             return new UnityEngine.Vector3((float)p.x, (float)p.y, (float)p.z);
         }
 
-        static UnityEngine.Vector3 Convert(Ros.Vector3 v)
+        static UnityEngine.Vector3 Convert(Vector3 v)
         {
             return new UnityEngine.Vector3((float)v.x, (float)v.y, (float)v.z);
         }
 
-        static UnityEngine.Quaternion Convert(Ros.Quaternion q)
+        static UnityEngine.Quaternion Convert(Quaternion q)
         {
             return new UnityEngine.Quaternion((float)q.x, (float)q.y, (float)q.z, (float)q.w);
         }
 
-        public static Ros.Time Convert(double unixEpochSeconds)
+        public static Time Convert(double unixEpochSeconds)
         {
             long nanosec = (long)(unixEpochSeconds * 1e9);
 
-            return new Ros.Time()
+            return new Time()
             {
                 secs = (int)(nanosec / 1000000000),
                 nsecs = (uint)(nanosec % 1000000000),
             };
         }
 
-        public static double Convert(Ros.Time time)
+        public static double Convert(Time time)
         {
             return (double)time.secs + (double)time.nsecs * 1e-9;
         }

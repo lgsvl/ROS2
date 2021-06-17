@@ -7,6 +7,8 @@
 
 using System;
 using Simulator.Bridge.Data;
+using Simulator.Bridge.Data.Lgsvl;
+using Simulator.Bridge.Data.Ros;
 // NOTE: DO NOT add using "Ros2.Ros" or "Ros2.Lgsvl" namespaces here to avoid
 // NOTE: confusion between types. Keep them fully qualified in this file.
 
@@ -20,34 +22,34 @@ namespace Simulator.Bridge.Ros2
         public void Register(IBridgePlugin plugin)
         {
             // point cloud is special, as we use special writer for performance reasons
-            plugin.AddType<PointCloudData>(Ros2Utils.GetMessageType<Ros.PointCloud2>());
+            plugin.AddType<PointCloudData>(Ros2Utils.GetMessageType<PointCloud2>());
             plugin.AddPublisherCreator(
                 (instance, topic) =>
                 {
                     var ros2Instance = instance as Ros2BridgeInstance;
-                    ros2Instance.AddPublisher<Ros.PointCloud2>(topic);
+                    ros2Instance.AddPublisher<PointCloud2>(topic);
                     var writer = new Ros2PointCloudWriter(ros2Instance, topic);
                     return new Publisher<PointCloudData>((data, completed) => writer.Write(data, completed));
                 }
             );
 
-            RegPublisher<ImageData, Ros.CompressedImage>(plugin, Ros2Conversions.ConvertFrom);
-            RegPublisher<CameraInfoData, Ros.CameraInfo>(plugin, Ros2Conversions.ConvertFrom);
-            RegPublisher<Detected3DObjectData, Lgsvl.Detection3DArray>(plugin, Ros2Conversions.ConvertFrom);
-            RegPublisher<Detected2DObjectData, Lgsvl.Detection2DArray>(plugin, Ros2Conversions.ConvertFrom);
-            RegPublisher<SignalDataArray, Lgsvl.SignalArray>(plugin, Ros2Conversions.ConvertFrom);
-            RegPublisher<CanBusData, Lgsvl.CanBusData>(plugin, Ros2Conversions.ConvertFrom);
-            RegPublisher<UltrasonicData, Lgsvl.Ultrasonic>(plugin, Ros2Conversions.ConvertFrom);
-            RegPublisher<GpsData, Ros.NavSatFix>(plugin, Ros2Conversions.ConvertFrom);
-            RegPublisher<GpsOdometryData, Ros.Odometry>(plugin, Ros2Conversions.ConvertFrom);
-            RegPublisher<ImuData, Ros.Imu>(plugin, Ros2Conversions.ConvertFrom);
-            RegPublisher<ClockData, Ros.Clock>(plugin, Ros2Conversions.ConvertFrom);
-            RegPublisher<VehicleOdometryData, Lgsvl.VehicleOdometry>(plugin, Ros2Conversions.ConvertFrom);
+            RegPublisher<ImageData, CompressedImage>(plugin, Ros2Conversions.ConvertFrom);
+            RegPublisher<CameraInfoData, CameraInfo>(plugin, Ros2Conversions.ConvertFrom);
+            RegPublisher<Detected3DObjectData, Detection3DArray>(plugin, Ros2Conversions.ConvertFrom);
+            RegPublisher<Detected2DObjectData, Detection2DArray>(plugin, Ros2Conversions.ConvertFrom);
+            RegPublisher<SignalDataArray, SignalArray>(plugin, Ros2Conversions.ConvertFrom);
+            RegPublisher<Data.CanBusData, Data.Lgsvl.CanBusData>(plugin, Ros2Conversions.ConvertFrom);
+            RegPublisher<UltrasonicData, Ultrasonic>(plugin, Ros2Conversions.ConvertFrom);
+            RegPublisher<GpsData, NavSatFix>(plugin, Ros2Conversions.ConvertFrom);
+            RegPublisher<GpsOdometryData, Odometry>(plugin, Ros2Conversions.ConvertFrom);
+            RegPublisher<ImuData, Imu>(plugin, Ros2Conversions.ConvertFrom);
+            RegPublisher<ClockData, Clock>(plugin, Ros2Conversions.ConvertFrom);
+            RegPublisher<VehicleOdometryData, VehicleOdometry>(plugin, Ros2Conversions.ConvertFrom);
 
-            RegSubscriber<VehicleStateData, Lgsvl.VehicleStateData>(plugin, Ros2Conversions.ConvertTo);
-            RegSubscriber<VehicleControlData, Lgsvl.VehicleControlData>(plugin, Ros2Conversions.ConvertTo);
-            RegSubscriber<Detected2DObjectArray, Lgsvl.Detection2DArray>(plugin, Ros2Conversions.ConvertTo);
-            RegSubscriber<Detected3DObjectArray, Lgsvl.Detection3DArray>(plugin, Ros2Conversions.ConvertTo);
+            RegSubscriber<Data.VehicleStateData, Data.Lgsvl.VehicleStateData>(plugin, Ros2Conversions.ConvertTo);
+            RegSubscriber<Data.VehicleControlData, Data.Lgsvl.VehicleControlData>(plugin, Ros2Conversions.ConvertTo);
+            RegSubscriber<Detected2DObjectArray, Detection2DArray>(plugin, Ros2Conversions.ConvertTo);
+            RegSubscriber<Detected3DObjectArray, Detection3DArray>(plugin, Ros2Conversions.ConvertTo);
         }
 
         public void RegPublisher<DataType, BridgeType>(IBridgePlugin plugin, Func<DataType, BridgeType> converter)

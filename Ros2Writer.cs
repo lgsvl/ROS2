@@ -9,6 +9,7 @@ using System;
 using System.Diagnostics;
 using System.Text;
 using Simulator.Bridge.Data;
+using Simulator.Bridge.Data.Ros;
 
 namespace Simulator.Bridge.Ros2
 {
@@ -51,52 +52,52 @@ namespace Simulator.Bridge.Ros2
 
     class Ros2PointCloudWriter
     {
-        Ros2Writer<Ros.PointCloud2> Writer;
+        Ros2Writer<PointCloud2> Writer;
 
         byte[] Buffer;
 
-        static readonly Ros.PointField[] PointFields = new[]
+        static readonly PointField[] PointFields = new[]
         {
-            new Ros.PointField()
+            new PointField()
             {
                 name = "x",
                 offset = 0,
-                datatype = Ros.PointField.FLOAT32,
+                datatype = PointField.FLOAT32,
                 count = 1,
             },
-            new Ros.PointField()
+            new PointField()
             {
                 name = "y",
                 offset = 4,
-                datatype = Ros.PointField.FLOAT32,
+                datatype = PointField.FLOAT32,
                 count = 1,
             },
-            new Ros.PointField()
+            new PointField()
             {
                 name = "z",
                 offset = 8,
-                datatype = Ros.PointField.FLOAT32,
+                datatype = PointField.FLOAT32,
                 count = 1,
             },
-            new Ros.PointField()
+            new PointField()
             {
                 name = "intensity",
                 offset = 16,
-                datatype = Ros.PointField.UINT8,
+                datatype = PointField.UINT8,
                 count = 1,
             },
-            new Ros.PointField()
+            new PointField()
             {
                 name = "timestamp",
                 offset = 24,
-                datatype = Ros.PointField.FLOAT64,
+                datatype = PointField.FLOAT64,
                 count = 1,
             },
         };
 
         public Ros2PointCloudWriter(Ros2BridgeInstance instance, string topic)
         {
-            Writer = new Ros2Writer<Ros.PointCloud2>(instance, topic);
+            Writer = new Ros2Writer<PointCloud2>(instance, topic);
         }
 
         public void Write(PointCloudData data, Action completed)
@@ -132,9 +133,9 @@ namespace Simulator.Bridge.Ros2
                 }
             }
 
-            var msg = new Ros.PointCloud2()
+            var msg = new PointCloud2()
             {
-                header = new Ros.Header()
+                header = new Header()
                 {
                     stamp = Ros2Conversions.Convert(data.Time),
                     frame_id = data.Frame,

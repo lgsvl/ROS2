@@ -14,14 +14,10 @@ using System.Linq.Expressions;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using Unity.Collections.LowLevel.Unsafe;
+using Simulator.Bridge.Data.Ros;
 
 namespace Simulator.Bridge.Ros2
 {
-    public struct PartialByteArray
-    {
-        public byte[] Array;
-        public int Length;
-    }
 
     public static class Ros2Serialization
     {
