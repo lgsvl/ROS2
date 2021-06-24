@@ -1,5 +1,5 @@
 {
-  "id": "49bae77c-c102-4fbf-8296-0b1a40b22b9f",
+  "id": "05a095cc-bab5-4e7b-981c-314d54351550",
   "name": "ROS 2",
   "accessType": "public",
   "description": "This bridge allows connecting to ROS 2 based AV stacks. ROS 2 Bridge requires IP address, port number while setting up Simulation Configuration.",
