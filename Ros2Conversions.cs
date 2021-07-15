@@ -450,6 +450,7 @@ namespace Simulator.Bridge.Ros2
                 Braking = data.braking_pct,
                 SteerAngle = UnityEngine.Mathf.Lerp(-1f, 1f, k),
                 SteerInput = data.target_wheel_angular_rate,
+                TargetGear = (GearPosition)(int)data.target_gear,
             };
         }
 
