@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2020 LG Electronics, Inc.
+ * Copyright (c) 2020-2021 LG Electronics, Inc.
  *
  * This software contains code licensed as described in LICENSE.
  *
@@ -14,7 +14,7 @@ using Simulator.Bridge.Data.Ros;
 
 namespace Simulator.Bridge.Ros2
 {
-    [BridgeName("ROS2")]
+    [BridgeName("ROS2", "ROS2")]
     public class Ros2BridgeFactory : IBridgeFactory
     {
         public IBridgeInstance CreateInstance() => new Ros2BridgeInstance();
