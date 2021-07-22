@@ -17,6 +17,13 @@ using Unity.Mathematics;
 
 namespace Simulator.Bridge.Ros2
 {
+    using Unity.Collections;
+    using UnityEngine;
+    using Pose = Data.Ros.Pose;
+    using Quaternion = Data.Ros.Quaternion;
+    using Time = Data.Ros.Time;
+    using Vector3 = Data.Ros.Vector3;
+
     static class Ros2Conversions
     {
         public static CompressedImage ConvertFrom(ImageData data)
@@ -35,6 +42,100 @@ namespace Simulator.Bridge.Ros2
                     Length = data.Length,
                 },
             };
+        }
+
+        public static Image ConvertFrom(UncompressedImageData data)
+        {
+            var stride = data.Length / (data.Width * data.Height);
+            var step = (uint) (stride * data.Width);
+            byte isBigEndian;
+
+            unsafe
+            {
+                var be = data.IsBigEndian;
+                isBigEndian = *(byte*) (&be);
+            }
+
+            // Data from NativeArray has to be moved to managed array.
+            // If BridgeMessageDispatcher was used to publish this message, this was done before and this path will
+            // never execute (Bytes has valid data already, NativeArray is default).
+            if (data.NativeArray != default)
+            {
+                if (data.Bytes == null || data.Bytes.Length != data.Length)
+                {
+                    // This is the slowest path - consider providing reusable Bytes array with valid size to avoid
+                    // unnecessary allocations.
+                    data.Bytes = new byte[data.Length];
+                }
+
+                NativeArray<byte>.Copy(data.NativeArray, 0, data.Bytes, 0, data.Length);
+            }
+
+            return new Image()
+            {
+                header = new Header()
+                {
+                    stamp = Convert(data.Time),
+                    frame_id = data.Frame,
+                },
+                width = (uint) data.Width,
+                height = (uint) data.Height,
+                step = step,
+                encoding = data.Encoding,
+                is_bigendian = isBigEndian,
+                data = data.Bytes
+            };
+        }
+
+        public static LaserScan ConvertFrom(LaserScanData data)
+        {
+            var count = data.Points.Length;
+
+            if (data.RangesCache == null || data.RangesCache.Length != count)
+                data.RangesCache = new float[count];
+
+            if (data.IntensitiesCache == null || data.IntensitiesCache.Length != count)
+                data.IntensitiesCache = new float[count];
+
+            for (var i = 0; i < count; ++i)
+            {
+                var point = data.Points[i];
+
+                var pos = new UnityEngine.Vector3(point.x, point.y, point.z);
+                var intensity = point.w * 255f;
+
+                pos = data.Transform.MultiplyPoint3x4(pos);
+                var distance = pos.magnitude;
+                if (distance < data.RangeMin || distance > data.RangeMax)
+                {
+                    distance = float.PositiveInfinity; // TODO: verify how LaserScan filters out points
+                    intensity = 0;
+                }
+
+                var iOut = count - 1 - i;
+                data.RangesCache[iOut] = distance;
+                data.IntensitiesCache[iOut] = intensity;
+            }
+
+            var msg = new LaserScan()
+            {
+                header = new Header()
+                {
+                    stamp = Convert(data.Time),
+                    frame_id = data.Frame,
+                },
+                angle_min = data.MinAngle,
+                angle_max = data.MaxAngle,
+                angle_increment = data.AngleStep,
+                time_increment = data.TimeIncrement,
+                scan_time = data.ScanTime,
+                range_min = data.RangeMin,
+                range_max = data.RangeMax,
+                ranges = data.RangesCache,
+                intensities = data.IntensitiesCache
+            };
+
+            return msg;
         }
 
         public static CameraInfo ConvertFrom(CameraInfoData data)

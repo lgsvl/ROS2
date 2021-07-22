@@ -34,6 +34,8 @@ namespace Simulator.Bridge.Ros2
             );
 
             RegPublisher<ImageData, CompressedImage>(plugin, Ros2Conversions.ConvertFrom);
+            RegPublisher<UncompressedImageData, Image>(plugin, Ros2Conversions.ConvertFrom);
+            RegPublisher<LaserScanData, LaserScan>(plugin, Ros2Conversions.ConvertFrom);
             RegPublisher<CameraInfoData, CameraInfo>(plugin, Ros2Conversions.ConvertFrom);
             RegPublisher<Detected3DObjectData, Detection3DArray>(plugin, Ros2Conversions.ConvertFrom);
             RegPublisher<Detected2DObjectData, Detection2DArray>(plugin, Ros2Conversions.ConvertFrom);
