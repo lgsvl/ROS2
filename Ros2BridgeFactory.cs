@@ -47,6 +47,7 @@ namespace Simulator.Bridge.Ros2
             RegPublisher<ImuData, Imu>(plugin, Ros2Conversions.ConvertFrom);
             RegPublisher<ClockData, Clock>(plugin, Ros2Conversions.ConvertFrom);
             RegPublisher<VehicleOdometryData, VehicleOdometry>(plugin, Ros2Conversions.ConvertFrom);
+            RegPublisher<DetectedRadarObjectData, Data.Lgsvl.DetectedRadarObjectArray>(plugin, Ros2Conversions.ConvertFrom);
 
             RegSubscriber<Data.VehicleStateData, Data.Lgsvl.VehicleStateData>(plugin, Ros2Conversions.ConvertTo);
             RegSubscriber<Data.VehicleControlData, Data.Lgsvl.VehicleControlData>(plugin, Ros2Conversions.ConvertTo);

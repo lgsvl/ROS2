@@ -350,15 +350,16 @@ namespace Simulator.Bridge.Ros2
             };
         }
 
-        public static DetectedRadarObjectArray ConvertFrom(DetectedRadarObjectData data)
+        public static Data.Lgsvl.DetectedRadarObjectArray ConvertFrom(DetectedRadarObjectData data)
         {
-            var r = new DetectedRadarObjectArray()
+            var r = new Data.Lgsvl.DetectedRadarObjectArray()
             {
                 header = new Header()
                 {
                     stamp = Convert(data.Time),
                     frame_id = data.Frame,
                 },
+                objects = new List<Data.Lgsvl.DetectedRadarObject>(),
             };
 
             foreach (var obj in data.Data)
